@@ -1,4 +1,4 @@
-from core.handlers import map_get
+from core import map_get
 import pygame
 import os
 
