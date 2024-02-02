@@ -1,17 +1,25 @@
+import os
+import sys
+
+import pygame
 import requests
 
-sp = ['Барнаул', 'Мелеуз', 'Йошкар-Ола']
-for city in sp:
-    geocoder_request = "http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode" \
-                       f"={city}&format=json"
-    response = requests.get(geocoder_request)
 
-    if response:
-        json_response = response.json()
-        toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
-        toponym_address = toponym["metaDataProperty"]["GeocoderMetaData"]["Address"]["Components"][2]['name']
-        print(toponym_address)
-    else:
+coords = (37.530887, 56.703118)
+
+def get_image(coords):
+    map_request = f"http://static-maps.yandex.ru/1.x/?ll={coords[0]},{coords[1]}&spn=0.002,0.002&l=map"
+    response = requests.get(map_request)
+
+    if not response:
         print("Ошибка выполнения запроса:")
-        print(geocoder_request)
+        print(map_request)
         print("Http статус:", response.status_code, "(", response.reason, ")")
+        sys.exit(1)
+
+    # Запишем полученное изображение в файл.
+    map_file = "map.png"
+    with open(map_file, "wb") as file:
+        file.write(response.content)
+    # возврааем картинку
+    return map_file
