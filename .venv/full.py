@@ -87,6 +87,7 @@ ui = """<?xml version="1.0" encoding="UTF-8"?>
 # 37.530887,55.703118
 class MyPillow(QMainWindow):
     def __init__(self):
+        self.anoth = 0
         super(MyPillow, self).__init__()
         # загружаем ui
         f = io.StringIO(ui)
@@ -100,33 +101,61 @@ class MyPillow(QMainWindow):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
-            self.size = self.size * 2
-            print(self.size)
-            self.crd()
+            if self.size >= 163.24:
+                print('max')
+            else:
+                self.size = self.size * 2
+                print(self.size)
+                self.map_file = get_image(self.cordsnow, self.size)
+                self.initUI()
         elif event.key() == Qt.Key_PageDown:  # Key_PageUp:
             if self.size <= 0.02:
-                print(self.size)
-                print(0)
-                pass
+                print('min')
             else:
                 self.size = self.size / 2
                 print(self.size)
-                self.crd()
-        '''
-        elif event.key() == Qt.Key_Up:    # Key_PageUp:
-
-
+                self.map_file = get_image(self.cordsnow, self.size)
+                self.initUI()
+        elif event.key() == Qt.Key_D:    # Key_PageUp:
+            self.x = float(self.x) + float(self.size) / 10
+            self.x = round(self.x, 5)
+            print(self.x)
+            self.cordsnow = f'{self.x},{self.y}'
+            self.map_file = get_image(self.cordsnow, self.size)
+            self.initUI()
+        elif event.key() == Qt.Key_A:    # Key_PageUp:
+            self.x = float(self.x) - float(self.size) / 10
+            self.x = round(self.x, 5)
+            print(self.x)
+            self.cordsnow = f'{self.x},{self.y}'
+            self.map_file = get_image(self.cordsnow, self.size)
+            self.initUI()
+        elif event.key() == Qt.Key_W:    # Key_PageUp:
+            self.y = float(self.y) + float(self.size) / 10
+            self.y = round(self.y, 5)
+            print(self.y)
+            self.cordsnow = f'{self.x},{self.y}'
+            self.map_file = get_image(self.cordsnow, self.size)
+            self.initUI()
+        elif event.key() == Qt.Key_S:  # Key_PageUp:
+            self.y = float(self.y) - float(self.size) / 10
+            self.y = round(self.y, 5)
+            print(self.y)
+            self.cordsnow = f'{self.x},{self.y}'
+            self.map_file = get_image(self.cordsnow, self.size)
+            self.initUI()
 
         elif event.key() == Qt.Key_PageDown:    # Key_PageUp:
-            if self.size <= 0.02:
-                print(self.size)
-                print(0)
-                pass'''
+            pass
 
     def crd(self):
         # получаем координаты
         print('we are here')
         self.cordsnow = self.coords.text()
+        data = str(self.cordsnow)
+        data = data.split(',')
+        self.x = data[0]
+        self.y = data[1]
         print(self.cordsnow)
         # получаем изображение
         self.map_file = get_image(self.cordsnow, self.size)
