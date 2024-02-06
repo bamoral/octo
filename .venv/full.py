@@ -143,13 +143,30 @@ class MyPillow(QMainWindow):
         # загружаем ui
         f = io.StringIO(ui)
         uic.loadUi(f, self)
+        self.viewmap = 'map'
+        self.cordsnow = '37.530887,55.703118'
         # подключаем кнопки
         self.cords.clicked.connect(self.crd)
         self.cords_2.clicked.connect(self.place)
+        self.pushButton.clicked.connect(self.map1)
+        self.pushButton_2.clicked.connect(self.sat2)
+        self.pushButton_3.clicked.connect(self.mapset)
         self.size = 0.02
         self.image = QLabel(self)
         self.image.move(100, 130)
         self.image.resize(600, 350)
+
+    def map1(self):
+        self.viewmap = 'map'
+        print(self.viewmap)
+
+    def sat2(self):
+        self.viewmap = 'sat'
+        print(self.viewmap)
+
+    def mapset(self):
+        self.viewmap = 'sat,skl'
+        print(self.viewmap)
 
     def place(self):
         self.data = self.coords.text()
@@ -221,17 +238,20 @@ class MyPillow(QMainWindow):
             pass
 
     def crd(self):
-        # получаем координаты
-        print('we are here')
-        self.cordsnow = self.coords.text()
-        data = str(self.cordsnow)
-        data = data.split(',')
-        self.x = data[0]
-        self.y = data[1]
-        print(self.cordsnow)
-        # получаем изображение
+        try:
+            # получаем координаты
+            print('we are here')
+            self.cordsnow = self.coords.text()
+            data = str(self.cordsnow)
+            data = data.split(',')
+            self.x = data[0]
+            self.y = data[1]
+            print(self.cordsnow)
+            # получаем изображение
+        except Exception:
+            print('ошибка')
         self.map_file = get_image(self.cordsnow, self.size)
-        # подгружаем картинку
+            # подгружаем картинку
         self.initUI()
 
     def initUI(self):
@@ -243,9 +263,10 @@ class MyPillow(QMainWindow):
         """При закрытии формы подчищаем за собой"""
         os.remove(self.map_file)
 
-    def get_image(coords, size):
-        map_request = f"http://static-maps.yandex.ru/1.x/?ll={coords}&spn={size},0.002&l=sat"
-        # map_request = "https://static-maps.yandex.ru/1.x/?ll=130.752946,-27.307274&spn=0.016457,30.00619&l=sat"
+    def get_image(self, coords, size):
+        # map_request = f"http://static-maps.yandex.ru/1.x/?ll={coords}&spn={size},0.002&l={self.viewmap}"
+        map_request = "https://static-maps.yandex.ru/1.x/?ll=37.530887,55.703118&spn=0.006457,0.009&l=sat,skl"
+        # map_request = f"https://static-maps.yandex.ru/1.x/?ll={coords}&spn={size},0.009&l=sat,skl"
         response = requests.get(map_request)
 
         if not response:
