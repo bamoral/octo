@@ -2,9 +2,6 @@ import io
 import sys
 import requests
 
-from UI import ui
-from map_get import get_image
-
 from PyQt5 import uic
 from PyQt5.QtCore import QPoint
 from PyQt5.QtGui import QPixmap, QImage, QColor, QTransform
@@ -158,15 +155,18 @@ class MyPillow(QMainWindow):
 
     def map1(self):
         self.viewmap = 'map'
-        print(self.viewmap)
+        self.map_file = self.get_image()
+        self.initUI()
 
     def sat2(self):
         self.viewmap = 'sat'
-        print(self.viewmap)
+        self.map_file = self.get_image()
+        self.initUI()
 
     def mapset(self):
         self.viewmap = 'sat,skl'
-        print(self.viewmap)
+        self.map_file = self.get_image()
+        self.initUI()
 
     def place(self):
         self.data = self.coords.text()
@@ -182,7 +182,7 @@ class MyPillow(QMainWindow):
             self.x = data[0]
             self.y = data[1]
             print(self.cordsnow)
-            self.map_file = get_image(self.cordsnow, self.size)
+            self.map_file = self.get_image()
             self.initUI()
 
     def keyPressEvent(self, event):
@@ -192,7 +192,7 @@ class MyPillow(QMainWindow):
             else:
                 self.size = self.size * 2
                 print(self.size)
-                self.map_file = get_image(self.cordsnow, self.size)
+                self.map_file = self.get_image()
                 self.initUI()
         elif event.key() == Qt.Key_PageDown:  # Key_PageUp:
             if self.size <= 0.02:
@@ -200,42 +200,36 @@ class MyPillow(QMainWindow):
             else:
                 self.size = self.size / 2
                 print(self.size)
-                self.map_file = get_image(self.cordsnow, self.size)
+                self.map_file = self.get_image()
                 self.initUI()
         elif event.key() == Qt.Key_D:    # Key_PageUp:
             self.x = float(self.x) + float(self.size) / 10
             self.x = round(self.x, 5)
             print(self.x)
             self.cordsnow = f'{self.x},{self.y}'
-            self.map_file = get_image(self.cordsnow, self.size)
+            self.map_file = self.get_image()
             self.initUI()
         elif event.key() == Qt.Key_A:    # Key_PageUp:
             self.x = float(self.x) - float(self.size) / 10
             self.x = round(self.x, 5)
             print(self.x)
             self.cordsnow = f'{self.x},{self.y}'
-            self.map_file = get_image(self.cordsnow, self.size)
+            self.map_file = self.get_image()
             self.initUI()
         elif event.key() == Qt.Key_W:    # Key_PageUp:
             self.y = float(self.y) + float(self.size) / 10
             self.y = round(self.y, 5)
             print(self.y)
             self.cordsnow = f'{self.x},{self.y}'
-            self.map_file = get_image(self.cordsnow, self.size)
+            self.map_file = self.get_image()
             self.initUI()
         elif event.key() == Qt.Key_S:  # Key_PageUp:
             self.y = float(self.y) - float(self.size) / 10
             self.y = round(self.y, 5)
             print(self.y)
             self.cordsnow = f'{self.x},{self.y}'
-            self.map_file = get_image(self.cordsnow, self.size)
+            self.map_file = self.get_image()
             self.initUI()
-
-        elif event.key() == Qt.Key_PageDown:    # Key_PageUp:
-            pass
-
-        elif event.key() == Qt.Key_PageDown:    # Key_PageUp:
-            pass
 
     def crd(self):
         try:
@@ -250,7 +244,7 @@ class MyPillow(QMainWindow):
             # получаем изображение
         except Exception:
             print('ошибка')
-        self.map_file = get_image(self.cordsnow, self.size)
+        self.map_file = self.get_image()
             # подгружаем картинку
         self.initUI()
 
@@ -263,9 +257,9 @@ class MyPillow(QMainWindow):
         """При закрытии формы подчищаем за собой"""
         os.remove(self.map_file)
 
-    def get_image(self, coords, size):
-        # map_request = f"http://static-maps.yandex.ru/1.x/?ll={coords}&spn={size},0.002&l={self.viewmap}"
-        map_request = "https://static-maps.yandex.ru/1.x/?ll=37.530887,55.703118&spn=0.006457,0.009&l=sat,skl"
+    def get_image(self):
+        map_request = f"http://static-maps.yandex.ru/1.x/?ll={self.cordsnow}&spn={self.size},0.002&l={self.viewmap}"
+        # map_request = "https://static-maps.yandex.ru/1.x/?ll=37.530887,55.703118&spn=0.006457,0.009&l=sat,skl"
         # map_request = f"https://static-maps.yandex.ru/1.x/?ll={coords}&spn={size},0.009&l=sat,skl"
         response = requests.get(map_request)
 
