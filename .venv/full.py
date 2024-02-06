@@ -32,7 +32,7 @@ ui = """<?xml version="1.0" encoding="UTF-8"?>
    <widget class="QPushButton" name="cords">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>430</x>
       <y>60</y>
       <width>141</width>
       <height>23</height>
@@ -65,6 +65,58 @@ ui = """<?xml version="1.0" encoding="UTF-8"?>
      </rect>
     </property>
    </widget>
+   <widget class="QPushButton" name="cords_2">
+    <property name="geometry">
+     <rect>
+      <x>620</x>
+      <y>60</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Найти объект</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>530</y>
+      <width>151</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Карта </string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>530</y>
+      <width>161</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Спутник</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_3">
+    <property name="geometry">
+     <rect>
+      <x>580</x>
+      <y>530</y>
+      <width>141</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Гибрид</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -94,10 +146,24 @@ class MyPillow(QMainWindow):
         uic.loadUi(f, self)
         # подключаем кнопки
         self.cords.clicked.connect(self.crd)
+        self.cords_2.clicked.connect(self.place)
         self.size = 0.02
         self.image = QLabel(self)
         self.image.move(100, 130)
-        self.image.resize(600, 450)
+        self.image.resize(600, 350)
+
+    def place(self):
+        self.data = self.coords.text()
+        geocoder_request = f"http://geocode-maps.yandex.ru/1.x/?apikey=40d1649f-0493-4b70-98ba-98533de7710b&geocode={self.data}, 1&format=json"
+        response = requests.get(geocoder_request)
+        if response:
+            json_response = response.json()
+            toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
+            toponym_coodrinates = toponym["Point"]["pos"]
+            self.cordsnow = str(toponym_coodrinates).replace(' ', ',')
+            print(self.cordsnow)
+            self.map_file = get_image(self.cordsnow, self.size)
+            self.initUI()
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_PageUp:
@@ -172,7 +238,8 @@ class MyPillow(QMainWindow):
         os.remove(self.map_file)
 
     def get_image(coords, size):
-        map_request = f"http://static-maps.yandex.ru/1.x/?ll={coords}&spn={size},0.002&l=map"
+        map_request = f"http://static-maps.yandex.ru/1.x/?ll={coords}&spn={size},0.002&l=sat"
+        # map_request = "https://static-maps.yandex.ru/1.x/?ll=130.752946,-27.307274&spn=0.016457,30.00619&l=sat"
         response = requests.get(map_request)
 
         if not response:
