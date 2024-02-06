@@ -135,7 +135,6 @@ ui = """<?xml version="1.0" encoding="UTF-8"?>
 </ui>
 """
 
-
 # 37.530887,55.703118
 class MyPillow(QMainWindow):
     def __init__(self):
@@ -161,6 +160,10 @@ class MyPillow(QMainWindow):
             toponym = json_response["response"]["GeoObjectCollection"]["featureMember"][0]["GeoObject"]
             toponym_coodrinates = toponym["Point"]["pos"]
             self.cordsnow = str(toponym_coodrinates).replace(' ', ',')
+            data = str(self.cordsnow)
+            data = data.split(',')
+            self.x = data[0]
+            self.y = data[1]
             print(self.cordsnow)
             self.map_file = get_image(self.cordsnow, self.size)
             self.initUI()
@@ -210,6 +213,9 @@ class MyPillow(QMainWindow):
             self.cordsnow = f'{self.x},{self.y}'
             self.map_file = get_image(self.cordsnow, self.size)
             self.initUI()
+
+        elif event.key() == Qt.Key_PageDown:    # Key_PageUp:
+            pass
 
         elif event.key() == Qt.Key_PageDown:    # Key_PageUp:
             pass
